@@ -37,8 +37,11 @@ group {
 	get '/rand' => sub {
 		my $c = shift;
 		
+		my $card_sets = $c->every_param('card_set');
+		$card_sets = app->config->{card_sets} // [] unless @$card_sets;
+		
 		my @where = '"csbc"."card_set_id" = ANY ($1)';
-		my @params = app->config->{card_sets} // [];
+		my @params = $card_sets;
 		
 		my $pick = $c->param('pick');
 		if (defined $pick) {
@@ -84,7 +87,8 @@ group {
 	get '/rand' => sub {
 		my $c = shift;
 		
-		my $card_sets = app->config->{card_sets} // [];
+		my $card_sets = $c->every_param('card_set');
+		$card_sets = app->config->{card_sets} // [] unless @$card_sets;
 		my $count = $c->param('count') // 1;
 		return $c->render(json => { error => "Invalid count parameter $count (must be positive integer between 1 and 10)" })
 			unless $count =~ /^\d+$/ and $count > 0 and $count <= 10;
