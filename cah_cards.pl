@@ -17,6 +17,7 @@ my $default_config = {
 	card_sets => DEFAULT_CARD_SETS,
 };
 
+app->types->type(json => 'application/json;charset=UTF-8');
 app->config(plugin 'Config' => { default => $default_config });
 my ($db_host, $db_name, $db_user, $db_pass) =
 	@{app->config}{qw(db_host db_name db_user db_pass)};
