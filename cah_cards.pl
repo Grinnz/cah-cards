@@ -3,8 +3,6 @@
 use Mojolicious::Lite;
 use Mojo::Pg;
 
-app->secrets(['no sessions']);
-
 use constant DEFAULT_CARD_SETS => [
 	1151,1152,100211,1155,1256,100154,100415,100257,1153,1154,1488,100422,
 	100049,100050,100051,100312,100485,100560,100532,100531,100017
@@ -30,6 +28,8 @@ if (defined $db_user) {
 }
 
 helper pg => sub { state $pg = Mojo::Pg->new("postgresql://$connect_string") };
+
+app->secrets(['no sessions']);
 
 group {
 	under '/cards/black';
