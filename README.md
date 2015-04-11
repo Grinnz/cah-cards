@@ -28,7 +28,7 @@ Create a file named cah_cards.conf in the root directory to configure the connec
 
 Then, start the application as a [daemon](https://metacpan.org/pod/Mojolicious::Command::daemon):
 
-    perl cah_cards.pl daemon
+    perl cah_cards.pl daemon -m production -l 'http://*:8080'
 
 Or, you can start it under the [Hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad) prefork server:
 
