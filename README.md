@@ -26,11 +26,11 @@ Import the card data from provided dump files into the database:
 
 Create a file named cah_cards.conf in the root directory to configure the connection, see cah_cards.conf.example.
 
-Then, start the application as a daemon:
+Then, start the application as a [daemon](https://metacpan.org/pod/Mojolicious::Command::daemon):
 
     perl cah_cards.pl daemon
 
-Or, you can start it under the Hypnotoad prefork server:
+Or, you can start it under the [Hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad) prefork server:
 
     hypnotoad cah_cards.pl
 
