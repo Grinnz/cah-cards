@@ -1,0 +1,6 @@
+{
+  db_name => 'cah',
+  db_user => 'cah',
+  db_pass => '',
+  hypnotoad => { proxy => 1, workers => 8 },
+};
