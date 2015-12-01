@@ -32,6 +32,8 @@ helper pg => sub { state $pg = Mojo::Pg->new("postgresql://$connect_string") };
 
 app->secrets(['no sessions']);
 
+plugin(SetUserGroup => { user => 'grinnz' });
+
 group {
 	under '/cards/black';
 	get '/rand' => sub {
