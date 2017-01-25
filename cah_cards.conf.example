@@ -2,5 +2,6 @@
   db_name => 'cah',
   db_user => 'cah',
   db_pass => '',
+  run_as_user => 'bob',
   hypnotoad => { proxy => 1, workers => 8 },
 };
