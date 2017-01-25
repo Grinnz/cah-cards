@@ -17,6 +17,7 @@ my $default_config = {
 	db_pass => undef,
 	card_sets => DEFAULT_CARD_SETS,
 	run_as_user => undef,
+	run_as_group => undef,
 };
 
 app->types->type(json => 'application/json;charset=UTF-8');
@@ -32,7 +33,7 @@ helper pg => sub { state $pg = Mojo::Pg->new($connect_url) };
 app->secrets(['no sessions']);
 
 if (defined(my $user = app->config->{run_as_user})) {
-	plugin SetUserGroup => { user => $user };
+	plugin SetUserGroup => { user => $user, group => app->config->{run_as_group} };
 }
 
 group {
