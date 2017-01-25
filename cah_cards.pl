@@ -2,6 +2,7 @@
 
 use Mojolicious::Lite;
 use Mojo::Pg;
+use Mojo::URL;
 
 use constant DEFAULT_CARD_SETS => [
 	1151,1152,100211,1155,1256,100154,100415,100257,1153,1154,1488,100422,
@@ -22,14 +23,11 @@ app->types->type(json => 'application/json;charset=UTF-8');
 app->config(plugin 'Config' => { default => $default_config });
 my ($db_host, $db_name, $db_user, $db_pass) =
 	@{app->config}{qw(db_host db_name db_user db_pass)};
-my $connect_string = "/$db_name";
-$connect_string = "$db_host$connect_string" if defined $db_host;
-if (defined $db_user) {
-	my $user_string = defined $db_pass ? "$db_user:$db_pass" : $db_user;
-	$connect_string = "$user_string\@$connect_string" if defined $user_string;
-}
+my $connect_url = Mojo::URL->new->scheme('postgresql')->path($db_name);
+$connect_url->host_port($db_host) if defined $db_host;
+$connect_url->userinfo(defined $db_pass ? "$db_user:$db_pass" : $db_user) if defined $db_user;
 
-helper pg => sub { state $pg = Mojo::Pg->new("postgresql://$connect_string") };
+helper pg => sub { state $pg = Mojo::Pg->new($connect_url) };
 
 app->secrets(['no sessions']);
 
