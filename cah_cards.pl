@@ -40,6 +40,7 @@ group {
 	under '/cards/black';
 	get '/rand' => sub {
 		my $c = shift;
+		my $tx = $c->render_later->tx;
 		
 		my $card_sets = $c->every_param('card_set');
 		$card_sets = app->config->{card_sets} // [] unless @$card_sets;
@@ -59,16 +60,13 @@ group {
 		my $query = 'SELECT "bc"."text", "bc"."pick" FROM "black_cards" AS "bc" ' .
 			'INNER JOIN "card_set_black_card" AS "csbc" ON "csbc"."black_card_id"="bc"."id" ' .
 			$where_str . ' ORDER BY random() LIMIT 1';
-		$c->delay(sub {
-			$c->pg->db->query($query, @params, shift->begin);
-		}, sub {
-			my ($delay, $err, $results) = @_;
-			die $err if $err;
-			$c->render(json => { card => $results->hash });
-		});
+		$c->pg->db->query_p($query, @params)
+			->then(sub { $c->render(json => { card => shift->hash }) })
+			->catch(sub { $c->reply->exception(shift); undef $tx });
 	};
 	get '/:card_id' => sub {
 		my $c = shift;
+		my $tx = $c->render_later->tx;
 		
 		my $id = $c->param('card_id');
 		return $c->render(json => { error => "Invalid card ID $id" })
@@ -76,13 +74,9 @@ group {
 		
 		my $query = 'SELECT "bc"."text", "bc"."pick" FROM "black_cards" AS "bc" ' .
 			'WHERE "bc"."id"=$1';
-		$c->delay(sub {
-			$c->pg->db->query($query, $id, shift->begin);
-		}, sub {
-			my ($delay, $err, $results) = @_;
-			die $err if $err;
-			$c->render(json => { card => $results->hash });
-		});
+		$c->pg->db->query_p($query, $id)
+			->then(sub { $c->render(json => { card => shift->hash }) })
+			->catch(sub { $c->reply->exception(shift); undef $tx });
 	};
 };
 
@@ -90,6 +84,7 @@ group {
 	under '/cards/white';
 	get '/rand' => sub {
 		my $c = shift;
+		my $tx = $c->render_later->tx;
 		
 		my $card_sets = $c->every_param('card_set');
 		$card_sets = app->config->{card_sets} // [] unless @$card_sets;
@@ -101,16 +96,13 @@ group {
 			'INNER JOIN "card_set_white_card" AS "cswc" ON "cswc"."white_card_id"="wc"."id" ' .
 			'WHERE "cswc"."card_set_id" = ANY ($1) GROUP BY "wc"."id" ' .
 			'ORDER BY random() LIMIT $2';
-		$c->delay(sub {
-			$c->pg->db->query($query, $card_sets, $count, shift->begin);
-		}, sub {
-			my ($delay, $err, $results) = @_;
-			die $err if $err;
-			$c->render(json => { cards => $results->hashes->to_array });
-		});
+		$c->pg->db->query_p($query, $card_sets, $count)
+			->then(sub { $c->render(json => { cards => shift->hashes->to_array }) })
+			->catch(sub { $c->reply->exception(shift); undef $tx });
 	};
 	get '/:card_id' => sub {
 		my $c = shift;
+		my $tx = $c->render_later->tx;
 		
 		my $id = $c->param('card_id');
 		return $c->render(json => { error => "Invalid card ID $id" })
@@ -118,13 +110,9 @@ group {
 		
 		my $query = 'SELECT "wc"."text" FROM "white_cards" AS "wc" ' .
 			'WHERE "wc"."id"=$1';
-		$c->delay(sub {
-			$c->pg->db->query($query, $id, shift->begin);
-		}, sub {
-			my ($delay, $err, $results) = @_;
-			die $err if $err;
-			$c->render(json => { card => $results->hash });
-		});
+		$c->pg->db->query_p($query, $id)
+			->then(sub { $c->render(json => { card => shift->hash }) })
+			->catch(sub { $c->reply->exception(shift); undef $tx });
 	};
 };
 
