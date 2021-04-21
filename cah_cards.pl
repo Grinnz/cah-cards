@@ -22,6 +22,7 @@ my $default_config = {
 
 app->types->type(json => 'application/json;charset=UTF-8');
 app->config(plugin 'Config' => { default => $default_config });
+app->log->with_roles('Mojo::Log::Role::Clearable')->path(app->config->{logfile}) if app->config->{logfile};
 my ($db_host, $db_name, $db_user, $db_pass) =
 	@{app->config}{qw(db_host db_name db_user db_pass)};
 my $connect_url = Mojo::URL->new->scheme('postgresql')->path($db_name);
