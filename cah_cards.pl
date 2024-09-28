@@ -29,7 +29,7 @@ my $connect_url = Mojo::URL->new->scheme('postgresql')->path($db_name);
 $connect_url->host_port($db_host) if defined $db_host;
 $connect_url->userinfo(defined $db_pass ? "$db_user:$db_pass" : $db_user) if defined $db_user;
 
-helper pg => sub { state $pg = Mojo::Pg->new($connect_url) };
+helper pg => sub { state $pg = Mojo::Pg->new($connect_url->to_unsafe_string) };
 
 app->secrets(['no sessions']);
 
